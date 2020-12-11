@@ -39,20 +39,20 @@ public class Processor implements Runnable {
         }
     }
 
-    public void processImage() {
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                processPixel(j, i);
+    private void processImage() {
+        for (int col = 0; col < image.getWidth(); col++) {
+            for (int row = 0; row < image.getHeight(); row++) {
+                processPixel(col, row);
             }
         }
     }
 
-    public void processPixel(int col, int row) {
+    private void processPixel(int col, int row) {
         int[][] sample = new int[kernel.length][kernel.length];
 
-        for (int i = -1 * kernel.length / 2; i <= kernel.length / 2; i++) {
-            for (int j = -1 * kernel.length / 2; j <= kernel.length / 2; j++) {
-                sample[i + kernel.length / 2][j + kernel.length / 2] = get(col + i, row + j);
+        for (int x = -1 * kernel.length / 2; x <= kernel.length / 2; x++) {
+            for (int y = -1 * kernel.length / 2; y <= kernel.length / 2; y++) {
+                sample[x + kernel.length / 2][y + kernel.length / 2] = get(col + x, row + y);
             }
         }
 
@@ -75,7 +75,7 @@ public class Processor implements Runnable {
         set(col, row, val);
     }
 
-    public int get(int col, int row) {
+    private int get(int col, int row) {
         if (col < 0) {
             col = 0;
         }
@@ -91,7 +91,7 @@ public class Processor implements Runnable {
         return image.getRGB(col, row);
     }
 
-    public void set(int col, int row, int val) {
+    private void set(int col, int row, int val) {
         if (col < 0) {
             col = 0;
         }
