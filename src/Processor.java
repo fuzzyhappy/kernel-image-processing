@@ -52,7 +52,7 @@ public class Processor implements Runnable {
 
         for (int i = -1 * kernel.length / 2; i <= kernel.length / 2; i++) {
             for (int j = -1 * kernel.length / 2; j <= kernel.length / 2; j++) {
-                sample[i + kernel.length / 2][j + kernel.length / 2] = get(col + j, row + i);
+                sample[i + kernel.length / 2][j + kernel.length / 2] = get(col + i, row + j);
             }
         }
 
