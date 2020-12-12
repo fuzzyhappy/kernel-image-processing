@@ -46,9 +46,9 @@ public class KernelProcessor {
             }
         }
 
-        float red = 0;
-        float green = 0;
-        float blue = 0;
+        double red = 0;
+        double green = 0;
+        double blue = 0;
 
         // applies dot product
         for (int i = 0; i < kernel.length; i ++) {

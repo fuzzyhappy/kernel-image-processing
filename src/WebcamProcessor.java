@@ -1,6 +1,7 @@
 import com.github.sarxos.webcam.Webcam;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,10 +9,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -67,6 +72,40 @@ public class WebcamProcessor implements Runnable {
     public void run() {
         JFrame frame = new JFrame();
 
+        // menu bar
+        JMenuBar menuBar = new JMenuBar();
+        // drop-down menu
+        JMenu menu = new JMenu("File");
+        // menu item that lets the user save their capture as a .png
+        JMenuItem save = new JMenuItem(" Save as .png");
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FileDialog chooser = new FileDialog(frame, "Use a .png extension", FileDialog.SAVE);
+                chooser.setVisible(true);
+                String filename = chooser.getFile();
+                if (filename != null) {
+                    // desired image format
+                    String format = chooser.getFile().substring(filename.lastIndexOf('.'));
+
+                    // only works if the user desires .png
+                    if (format.equalsIgnoreCase(".png")) {
+                        try {
+                            ImageIO.write(newImage, format, new File(String.format("%s%s%s",
+                                    chooser.getDirectory(), File.separator, chooser.getFile())));
+                        }
+                        catch (IOException exception) {
+                            exception.printStackTrace();
+                        }
+                        chooser.dispose();
+                    }
+                }
+            }
+        });
+        menu.add(save);
+        menuBar.add(menu);
+        frame.setJMenuBar(menuBar);
+
         // timer for updating the frame with webcam feed
         Timer timer = new Timer(1, new ActionListener() {
             @Override
@@ -114,7 +153,6 @@ public class WebcamProcessor implements Runnable {
      * @param args, command-line args
      */
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
         WebcamProcessor p = new WebcamProcessor("kernel.txt");
         SwingUtilities.invokeLater(p);
     }
