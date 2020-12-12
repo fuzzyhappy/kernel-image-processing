@@ -101,6 +101,8 @@ public class WebcamProcessor implements Runnable {
         });
 
         frame.setSize((int)webcam.getViewSize().getWidth(), (int)webcam.getViewSize().getHeight());
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
         frame.setTitle("It's you!");
         frame.validate();
         frame.setVisible(true);
