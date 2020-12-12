@@ -1,6 +1,7 @@
-import com.github.sarxos.webcam.*;
+import com.github.sarxos.webcam.Webcam;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -28,10 +29,9 @@ import javax.swing.Timer;
  */
 public class WebcamProcessor implements Runnable {
     private float[][] kernel;       // the kernel
-    private JPanel imagePanel;      // JPanel containing the processed image
     private BufferedImage image;    // input image
     private BufferedImage newImage; // output processed image
-    private Webcam webcam;          // user's webcam
+    private final Webcam webcam;    // user's webcam
 
     /**
      * Constructor forWebcamProcessor.
@@ -55,15 +55,6 @@ public class WebcamProcessor implements Runnable {
                     kernel[i][j] = Float.parseFloat(row[j]);
                 }
             }
-
-            // prepares the panel with the output image
-            imagePanel = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    g.drawImage(newImage, 0, 0, null);
-                }
-            };
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,8 +90,16 @@ public class WebcamProcessor implements Runnable {
                 timer.stop();
             }
         });
-        
-        frame.add(imagePanel);
+
+        // prepares the panel with the output image
+        frame.add(new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(newImage, 0, 0, null);
+            }
+        });
+
         frame.setSize((int)webcam.getViewSize().getWidth(), (int)webcam.getViewSize().getHeight());
         frame.setTitle("It's you!");
         frame.validate();
