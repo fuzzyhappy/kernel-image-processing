@@ -2,7 +2,7 @@
 by Evan Wang
 
 ## What is it
-Kernelized webcam is an application which runs an (not necessarily a very fast) implementation of kernel image processing on the user's live webcam feed. Kernelized webcam then displays the resultant feed in a 640x320 `JFrame` with a menu bar which gives the user the ability to save their capture as a `.png` file, if desired. 
+Kernelized webcam is an application which runs an (not necessarily a very fast) implementation of kernel image processing on the user's live webcam feed. Kernelized webcam then displays the resultant feed in a 640x480 `JFrame` with a menu bar which gives the user the ability to save their capture as a `.png` file, if desired. 
 
 This project was made in 2 days after the author didn't get the score he wanted on his calculus 3 final.
 
