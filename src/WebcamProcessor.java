@@ -86,10 +86,10 @@ public class WebcamProcessor implements Runnable {
                 String filename = chooser.getFile();
                 if (filename != null) {
                     // desired image format
-                    String format = chooser.getFile().substring(filename.lastIndexOf('.'));
+                    String format = chooser.getFile().substring(filename.lastIndexOf('.') + 1);
 
                     // only works if the user desires .png
-                    if (format.equalsIgnoreCase(".png")) {
+                    if (format.equalsIgnoreCase("png")) {
                         try {
                             ImageIO.write(newImage, format, new File(String.format("%s%s%s",
                                     chooser.getDirectory(), File.separator, chooser.getFile())));
