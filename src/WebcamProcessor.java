@@ -1,8 +1,6 @@
 import com.github.sarxos.webcam.Webcam;
 
-import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -13,17 +11,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 
 /**
  * Applies image processing to the user's webcam feed and displays the resultant stream
- * in a JFrame. The input kernel file must be titled "kernel.txt."
+ * in a JFrame. The kind of image processing is selectable by the user, using a panel of
+ * buttons.
+ *
+ * The input kernel file must be titled "kernel.txt."
  *
  * The text file containing the kernel should be formatted (for an example nxn matrix as
  * our kernel), the integer n on its own line, followed by the matrix, with each float
@@ -37,6 +32,7 @@ public class WebcamProcessor implements Runnable {
     private BufferedImage image;    // input image
     private BufferedImage newImage; // output processed image
     private final Webcam webcam;    // user's webcam
+    private Mode mode;
 
     /**
      * Constructor forWebcamProcessor.
@@ -60,6 +56,8 @@ public class WebcamProcessor implements Runnable {
                     kernel[i][j] = Float.parseFloat(row[j]);
                 }
             }
+
+            mode = Mode.KERNEL;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,13 +104,44 @@ public class WebcamProcessor implements Runnable {
         menuBar.add(menu);
         frame.setJMenuBar(menuBar);
 
+        // adds the processing mode button panel to the bottom of the screen
+        Container content = frame.getContentPane();
+        content.setLayout(new BorderLayout());
+        JPanel buttonPanel = new JPanel();
+        JButton halftoneButton = new JButton("Halftone Processing");
+        JButton kernelButton = new JButton("Kernel Processing");
+        JButton grayscaleButton = new JButton("Grayscaling");
+        ActionListener buttonListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource().equals(halftoneButton)) {
+                    mode = Mode.HALFTONE;
+                } else if (e.getSource().equals(kernelButton)) {
+                    mode = Mode.KERNEL;
+                } else if (e.getSource().equals(grayscaleButton)) {
+                    mode = Mode.GRAYSCALE;
+                }
+            }
+        };
+        halftoneButton.addActionListener(buttonListener);
+        kernelButton.addActionListener(buttonListener);
+        grayscaleButton.addActionListener(buttonListener);
+        buttonPanel.add(halftoneButton);
+        buttonPanel.add(kernelButton);
+        buttonPanel.add(grayscaleButton);
+        content.add(buttonPanel, BorderLayout.SOUTH);
+
         // timer for updating the frame with webcam feed
         Timer timer = new Timer(1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // reads image, processes the new image, and repaints the frame
                 image = webcam.getImage();
-                newImage = KernelProcessor.processImage(image, kernel);
+                switch (mode) {
+                    case HALFTONE -> newImage = Halftoner.processImage(image, 10);
+                    case KERNEL -> newImage = Kernelizer.processImage(image, kernel);
+                    case GRAYSCALE -> newImage = Grayscaler.processImage(image);
+                }
                 frame.repaint();
             }
         });
@@ -139,12 +168,19 @@ public class WebcamProcessor implements Runnable {
             }
         });
 
-        frame.setSize((int)webcam.getViewSize().getWidth(), (int)webcam.getViewSize().getHeight());
+        frame.setSize((int) webcam.getViewSize().getWidth(), (int) webcam.getViewSize().getHeight());
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setTitle("It's you!");
         frame.validate();
         frame.setVisible(true);
+    }
+
+    /**
+     * Processing mode
+     */
+    enum Mode {
+        HALFTONE, KERNEL, GRAYSCALE
     }
 
     /**

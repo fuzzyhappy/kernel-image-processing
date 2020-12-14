@@ -1,28 +1,26 @@
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Class filled with static utility methods to process a given image using a given nxn kernel matrix of floats.
+ * Image processor for gray-scaling.
  *
  * @author Evan Wang
  * @version 11 December 2020
  */
-public class KernelProcessor {
+public class Grayscaler {
     /**
      * Iterates through each of the image's pixels and calls processPixel() on each.
      *
      * @param image, the image to be processed
-     * @param kernel, the kernel to be applied to the image.
      * @return new processed BufferedImage
      */
-    public static BufferedImage processImage(BufferedImage image, float[][] kernel) {
-        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    public static BufferedImage processImage(BufferedImage image) {
         for (int col = 0; col < image.getWidth(); col++) {
             for (int row = 0; row < image.getHeight(); row++) {
-                processPixel(col, row, image, newImage, kernel);
+                processPixel(col, row, image, image);
             }
         }
-        return newImage;
+        return image;
     }
 
     /**
@@ -34,40 +32,25 @@ public class KernelProcessor {
      * @param row, the y coordinate of the pixel in the image
      * @param image, the image to be processed
      * @param newImage, the image to be output
-     * @param kernel, the kernel to be applied to the pixel
      */
-    private static void processPixel(int col, int row, BufferedImage image, BufferedImage newImage, float[][] kernel) {
-        // collects nxn sample of surrounding pixels
-        int[][] sample = new int[kernel.length][kernel.length];
-
-        for (int x = -1 * kernel.length / 2; x <= kernel.length / 2; x++) {
-            for (int y = -1 * kernel.length / 2; y <= kernel.length / 2; y++) {
-                sample[x + kernel.length / 2][y + kernel.length / 2] = get(col + x, row + y, image);
-            }
-        }
-
-        double red = 0;
-        double green = 0;
-        double blue = 0;
-
-        // applies dot product
-        for (int i = 0; i < kernel.length; i ++) {
-            for (int j = 0; j < kernel.length; j++) {
-                red += ((sample[i][j] >> 16) & 0xff) * kernel[i][j];
-                green += ((sample[i][j] >> 8) & 0xff) * kernel[i][j];
-                blue += ((sample[i][j]) & 0xff) * kernel[i][j];
-            }
-        }
-
-        // accounts for overflow of the byte value
-        red = Math.min(Math.max((int)(red), 0), 255);
-        green = Math.min(Math.max((int)(green), 0), 255);
-        blue = Math.min(Math.max((int)(blue), 0), 255);
-
-        // sets corresponding pixel to the dot product
-        int val = new Color((int)red, (int)green, (int)blue).getRGB();
-        set(col, row, newImage, val);
+    private static void processPixel(int col, int row, BufferedImage image, BufferedImage newImage) {
+        set(col, row, image, toGray(new Color(get(col, row, image))).getRGB());
     }
+
+    private static double intensity(Color color) {
+        int r = color.getRed();
+        int g = color.getGreen();
+        int b = color.getBlue();
+        if (r == g && r == b) return r;   // to avoid floating-point issues
+        return 0.299*r + 0.587*g + 0.114*b;
+    }
+
+    private static Color toGray(Color color) {
+        int y = (int) (Math.round(intensity(color)));   // round to nearest int
+        Color gray = new Color(y, y, y);
+        return gray;
+    }
+
 
     /**
      * Gets the 24-bit RGB value of the specified pixel. Accounts for edge
