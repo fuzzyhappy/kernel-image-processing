@@ -15,18 +15,17 @@ public class Grayscaler {
      * @return new processed BufferedImage
      */
     public static BufferedImage processImage(BufferedImage image) {
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         for (int col = 0; col < image.getWidth(); col++) {
             for (int row = 0; row < image.getHeight(); row++) {
-                processPixel(col, row, image, image);
+                processPixel(col, row, image, newImage);
             }
         }
-        return image;
+        return newImage;
     }
 
     /**
-     * Collects an nxn array of surrounding pixels to the specified pixel, applies
-     * dot product with kernel, then sets the corresponding pixel in the output
-     * image equal to that dot product.
+     * Converts specified pixel to grayscale.
      *
      * @param col, the x coordinate of the pixel in the image
      * @param row, the y coordinate of the pixel in the image
@@ -34,9 +33,15 @@ public class Grayscaler {
      * @param newImage, the image to be output
      */
     private static void processPixel(int col, int row, BufferedImage image, BufferedImage newImage) {
-        set(col, row, image, toGray(new Color(get(col, row, image))).getRGB());
+        set(col, row, newImage, grayscale(new Color(get(col, row, image))).getRGB());
     }
 
+    /**
+     * Calculates intensity of the specified pixel
+     *
+     * @param color, the color of the pixel
+     * @return the intensity of the pixel
+     */
     private static double intensity(Color color) {
         int r = color.getRed();
         int g = color.getGreen();
@@ -45,12 +50,17 @@ public class Grayscaler {
         return 0.299*r + 0.587*g + 0.114*b;
     }
 
-    private static Color toGray(Color color) {
+    /**
+     * Returns color of the gray-scaled specified pixel
+     *
+     * @param color, the color of the pixel
+     * @return the gray-scaled color
+     */
+    private static Color grayscale(Color color) {
         int y = (int) (Math.round(intensity(color)));   // round to nearest int
         Color gray = new Color(y, y, y);
         return gray;
     }
-
 
     /**
      * Gets the 24-bit RGB value of the specified pixel. Accounts for edge
