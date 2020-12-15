@@ -14,7 +14,7 @@ import javax.swing.*;
 /**
  * Applies image processing to the user's webcam feed and displays the resultant stream
  * in a JFrame. The kind of image processing is selectable by the user, using a panel of
- * buttons.
+ * buttons. The user can also customize image processing settings using pop-out GUIs.
  *
  * @author Evan Wang
  * @version 11 December 2020
@@ -32,7 +32,7 @@ public class WebcamProcessor implements Runnable {
 
 
     /**
-     * Constructor forWebcamProcessor.
+     * Constructor for WebcamProcessor.
      *
      * @param ker, pathname for the kernel text file
      */
@@ -109,6 +109,11 @@ public class WebcamProcessor implements Runnable {
         frame.setVisible(true);
     }
 
+    /**
+     * Creates the menu bar which allows the user to save their capture.
+     *
+     * @return the JFrame's menu bar
+     */
     public JMenuBar createMenuBar() {
         // menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -146,8 +151,12 @@ public class WebcamProcessor implements Runnable {
         return menuBar;
     }
 
+    /**
+     * Creates a panel of buttons for the user to select their image processing.
+     */
     public JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel();
+        // mode buttons
         JButton halftoneButton = new JButton("Halftone Processing");
         JButton kernelButton = new JButton("Kernel Processing");
         JButton grayscaleButton = new JButton("Grayscaling");
@@ -156,12 +165,10 @@ public class WebcamProcessor implements Runnable {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource().equals(halftoneButton)) {
                     mode = Mode.HALFTONE;
-                    JFrame customizer = createHalftoneCustomizer();
-                    customizer.setVisible(true);
+                    createHalftoneCustomizer();
                 } else if (e.getSource().equals(kernelButton)) {
                     mode = Mode.KERNEL;
-                    JFrame customizer = createKernelCustomizer();
-                    customizer.setVisible(true);
+                    createKernelCustomizer();
                 } else if (e.getSource().equals(grayscaleButton)) {
                     mode = Mode.GRAYSCALE;
                 }
@@ -177,15 +184,21 @@ public class WebcamProcessor implements Runnable {
         return buttonPanel;
     }
 
-    public JFrame createHalftoneCustomizer() {
+    /**
+     * Creates a frame which allows the user to change half-tone processing's half-tone
+     * radius, background color, and foreground color.
+     */
+    public void createHalftoneCustomizer() {
         JFrame customizer = new JFrame();
         customizer.setTitle("Customize your halftone settings!");
         customizer.setLocationRelativeTo(null);
         customizer.setSize(new Dimension(400, 150));
         customizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         Container content = customizer.getContentPane();
         content.setLayout(new BorderLayout());
 
+        // panel for setting labels and textboxes
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new GridLayout(3, 2, 2, 2));
 
@@ -197,6 +210,8 @@ public class WebcamProcessor implements Runnable {
         JLabel fgLabel = new JLabel("Foreground Hex Color:");
         JTextField fgText = new JTextField(String.format("#%02x%02x%02x",
                 halftonePalette[1].getRed(), halftonePalette[1].getGreen(), halftonePalette[1].getBlue()), 10);
+
+        // button for confirming settings
         JButton confirmButton = new JButton("Enter");
         confirmButton.addActionListener(new ActionListener() {
             @Override
@@ -217,22 +232,29 @@ public class WebcamProcessor implements Runnable {
         customizer.add(settingsPanel, BorderLayout.CENTER);
         customizer.add(confirmButton, BorderLayout.SOUTH);
 
-        return customizer;
+        customizer.setVisible(true);
     }
 
-    public JFrame createKernelCustomizer() {
+    /**
+     * Creates a frame which allows the user to customize the kernel.
+     */
+    public void createKernelCustomizer() {
         JFrame customizer = new JFrame();
         customizer.setTitle("Customize your kernel!");
         customizer.setLocationRelativeTo(null);
-        customizer.setSize(new Dimension(400, 300));
+        customizer.setSize(new Dimension(400, 200));
         customizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         Container content = customizer.getContentPane();
         content.setLayout(new BorderLayout());
 
+        // panel containing the textfield and button for the kernel's dimension
         JPanel dimPanel = new JPanel();
         JLabel dimLabel = new JLabel("n:");
         JTextField dimText = new JTextField("1", 3);
         JButton dimButton = new JButton("Enter");
+        // clicking the button creates a new panel containing a textfield for each
+        // kernel item.
         dimButton.addActionListener(new ActionListener() {
             JPanel panel;
 
@@ -240,6 +262,7 @@ public class WebcamProcessor implements Runnable {
             public void actionPerformed(ActionEvent e) {
                 panel = new JPanel();
                 int n = Integer.parseInt(dimText.getText());
+                // corresponding kernel input textfields
                 JTextField[][] kernelText = new JTextField[n][n];
 
                 panel = new JPanel();
@@ -248,6 +271,7 @@ public class WebcamProcessor implements Runnable {
                 JPanel kernelPanel = new JPanel();
                 kernelPanel.setLayout(new GridLayout(n, n, 2, 2));
 
+                // adds textfields to GUI
                 for (int i = 0; i < n; i++) {
                     for (int j = 0; j < n; j++) {
                         kernelText[i][j] = new JTextField("0", 5);
@@ -256,6 +280,7 @@ public class WebcamProcessor implements Runnable {
                 }
                 kernelPanel.validate();
 
+                // button for updating the kernel array based on textfields
                 JButton confirmKernelButton = new JButton("Confirm Kernel");
                 confirmKernelButton.addActionListener(new ActionListener() {
                     @Override
@@ -286,18 +311,18 @@ public class WebcamProcessor implements Runnable {
         customizer.validate();
         customizer.repaint();
 
-        return customizer;
+        customizer.setVisible(true);
     }
 
     /**
-     * Processing mode
+     * Enumerator for processing mode.
      */
     enum Mode {
         HALFTONE, KERNEL, GRAYSCALE
     }
 
     /**
-     * Program's main method, starts the processor
+     * Program's main method, starts the processor.
      *
      * @param args, command-line args
      */

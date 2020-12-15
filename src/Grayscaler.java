@@ -3,6 +3,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Image processor for gray-scaling.
+ * Based off of Princeton University's Grayscale.java.
  *
  * @author Evan Wang
  * @version 11 December 2020
@@ -37,7 +38,7 @@ public class Grayscaler {
     }
 
     /**
-     * Calculates intensity of the specified pixel
+     * Calculates intensity of the specified pixel using a Luma formula.
      *
      * @param color, the color of the pixel
      * @return the intensity of the pixel
@@ -47,11 +48,11 @@ public class Grayscaler {
         int g = color.getGreen();
         int b = color.getBlue();
         if (r == g && r == b) return r;   // to avoid floating-point issues
-        return 0.299*r + 0.587*g + 0.114*b;
+        return 0.299*r + 0.587*g + 0.114*b; // luma formula
     }
 
     /**
-     * Returns color of the gray-scaled specified pixel
+     * Returns color of the gray-scaled specified pixel.
      *
      * @param color, the color of the pixel
      * @return the gray-scaled color

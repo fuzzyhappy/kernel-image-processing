@@ -2,7 +2,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 /**
- * Class filled with static utility methods to process a given image using a given nxn kernel matrix of floats.
+ * Class filled with static utility methods to process a given image using a given
+ * nxn kernel matrix of floats.
  *
  * @author Evan Wang
  * @version 11 December 2020

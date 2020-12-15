@@ -4,16 +4,21 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
- * Image processor for half-toning.
+ * Class filled with static utility methods to process a given image by first gray-
+ * scaling the image and replacing areas of pixels with half-tone circles of a given
+ * radius.
  *
  * @author Evan Wang
  * @version 11 December 2020
  */
 public class Halftoner {
     /**
-     * Iterates through square batches of the image's pixels and calls processPixel() on each.
+     * Iterates through square batches of the image's pixels and calls processPixel()
+     * on each. Background and foreground colors are defaulted to black and white,
+     * respectively.
      *
      * @param image, the image to be processed
+     * @param rad, radius of the half-tone circles
      * @return new processed BufferedImage
      */
     public static BufferedImage processImage(BufferedImage image, int rad) {
@@ -35,9 +40,13 @@ public class Halftoner {
     }
 
     /**
-     * Iterates through square batches of the image's pixels and calls processPixel() on each.
+     * Iterates through square batches of the image's pixels and calls processPixel()
+     * on each. Background and foreground colors are specified by user.
      *
      * @param image, the image to be processed
+     * @param rad, radius of the half-tone circles
+     * @param bg, the background color
+     * @param fg, the foreground half-tone color
      * @return new processed BufferedImage
      */
     public static BufferedImage processImage(BufferedImage image, int rad, Color bg, Color fg) {
@@ -59,7 +68,8 @@ public class Halftoner {
     }
 
     /**
-     * Uses average grayscale value of squares of pixels to draw appropriate half-tone circles.
+     * Uses average grayscale value of squares of pixels to draw appropriate half-tone
+     * circles.
      *
      * @param col, the x coordinate of the pixel in the image
      * @param row, the y coordinate of the pixel in the image
