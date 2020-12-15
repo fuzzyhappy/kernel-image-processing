@@ -242,7 +242,7 @@ public class WebcamProcessor implements Runnable {
         JFrame customizer = new JFrame();
         customizer.setTitle("Customize your kernel!");
         customizer.setLocationRelativeTo(null);
-        customizer.setSize(new Dimension(400, 200));
+        customizer.setSize(new Dimension(400, 80));
         customizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         Container content = customizer.getContentPane();
@@ -256,51 +256,55 @@ public class WebcamProcessor implements Runnable {
         // clicking the button creates a new panel containing a textfield for each
         // kernel item.
         dimButton.addActionListener(new ActionListener() {
-            JPanel panel;
+            boolean pushed = false;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                panel = new JPanel();
-                int n = Integer.parseInt(dimText.getText());
-                // corresponding kernel input textfields
-                JTextField[][] kernelText = new JTextField[n][n];
+                // if the dimension button hasn't been pushed before, action is taken
+                if (!pushed) {
+                    pushed = true;
+                    int n = Integer.parseInt(dimText.getText());
+                    customizer.setSize(new Dimension(400, 50 + (n > 1 ? 50*n : 80)));
+                    // corresponding kernel input textfields
+                    JTextField[][] kernelText = new JTextField[n][n];
 
-                panel = new JPanel();
-                panel.setLayout(new BorderLayout());
+                    JPanel panel = new JPanel();
+                    panel.setLayout(new BorderLayout());
 
-                JPanel kernelPanel = new JPanel();
-                kernelPanel.setLayout(new GridLayout(n, n, 2, 2));
+                    JPanel kernelPanel = new JPanel();
+                    kernelPanel.setLayout(new GridLayout(n, n, 2, 2));
 
-                // adds textfields to GUI
-                for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        kernelText[i][j] = new JTextField("0", 5);
-                        kernelPanel.add(kernelText[i][j]);
-                    }
-                }
-                kernelPanel.validate();
-
-                // button for updating the kernel array based on textfields
-                JButton confirmKernelButton = new JButton("Confirm Kernel");
-                confirmKernelButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        kernel = new float[n][n];
-                        for (int i = 0; i < n; i++) {
-                            for (int j = 0; j < n; j++) {
-                                kernel[i][j] = Float.parseFloat(kernelText[i][j].getText());
-                                customizer.dispose();
-                            }
+                    // adds textfields to GUI
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            kernelText[i][j] = new JTextField("0", 5);
+                            kernelPanel.add(kernelText[i][j]);
                         }
                     }
-                });
+                    kernelPanel.validate();
 
-                panel.add(kernelPanel, BorderLayout.CENTER);
-                panel.add(confirmKernelButton, BorderLayout.SOUTH);
-                panel.validate();
-                customizer.add(panel);
-                customizer.validate();
-                customizer.repaint();
+                    // button for updating the kernel array based on textfields
+                    JButton confirmKernelButton = new JButton("Confirm Kernel");
+                    confirmKernelButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            kernel = new float[n][n];
+                            for (int i = 0; i < n; i++) {
+                                for (int j = 0; j < n; j++) {
+                                    kernel[i][j] = Float.parseFloat(kernelText[i][j].getText());
+                                    customizer.dispose();
+                                }
+                            }
+                        }
+                    });
+
+                    panel.add(kernelPanel, BorderLayout.CENTER);
+                    panel.add(confirmKernelButton, BorderLayout.SOUTH);
+                    panel.validate();
+                    customizer.add(panel);
+                    customizer.validate();
+                    customizer.repaint();
+                }
             }
         });
         dimPanel.add(dimLabel);
